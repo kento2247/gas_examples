@@ -1,6 +1,5 @@
 const productID = "sample"  //適当に入力
 const developer_name = "sample"  //適当に入力
-const shift_title = "タイトル"  //予定のタイトルを記入
 
 //共有リンク  https://drive.google.com/drive/folders/ ココ ?usp=sharing  がフォルダーID
 const googledrive_main_folderID = ""  //googleドライブのフォルダーID
@@ -8,9 +7,9 @@ const googledrive_main_folderID = ""  //googleドライブのフォルダーID
 
 function debug() {
   const data = [
-    [2022, 10, 6, 17, 21, "sample","サンプル"],
-    [2022, 10, 7, 17, 21, "sample","サンプル"]
-  ]  //[yyyy,mm,dd,begin,end,title,subtitle]
+    [2022, 10, 6, 17, 0, 21, 0, "sample", "サンプル"],
+    [2022, 10, 7, 17, 0, 21, 0, "sample", "サンプル"]
+  ]  //[yyyy, mm, dd, begin_hour, begin_min, end_hour, end_min,title,subtitle]
   //無限に増やせる
   console.log(make_ics("sample", data));  //make_ics(ファイル名、予定データ)
 }
@@ -42,17 +41,22 @@ function make_ics(filename, data) {
     var yy = String(data[i][0]);
     var mm = String(data[i][1]);
     var dd = String(data[i][2]);
-    var begin = String(data[i][3]);
-    var end = String(data[i][4]);
-    const title = String(data[i][5]);
-    const subtitle = String(data[i][6]);
+    var begin_h = String(data[i][3]);
+    var begin_m = String(data[i][4]);
+    var end_h = String(data[i][5]);
+    var end_m = String(data[i][6]);
+    const title = String(data[i][7]);
+    const subtitle = String(data[i][8]);
     if (yy.length < 2) yy = "0" + yy;  //yyyy/mm/ddの形式にするため
     if (mm.length < 2) mm = "0" + mm;  //yyyy/mm/ddの形式にするため
     if (dd.length < 2) dd = "0" + dd;  //yyyy/mm/ddの形式にするため
-    if (begin.length < 2) begin = "0" + begin;  //yyyy/mm/ddの形式にするため
-    if (end.length < 2) end = "0" + end;  //yyyy/mm/ddの形式にするため
-    contents += `\nBEGIN:VEVENT\nDTSTART;TZID=Asia/Tokyo;VALUE=DATE-TIME:${yy}${mm}${dd}T${begin}0000\nDTEND;TZID=Asia/Tokyo;VALUE=DATE-TIME:${yy}${mm}${dd}T${end}0000\nATTENDEE:\nDESCRIPTION:${subtitle}\nSUMMARY:${title}\nLOCATION:\nEND:VEVENT\n`
+    if (begin_h.length < 2) begin_h = "0" + begin_h;  //yyyy/mm/ddの形式にするため
+    if (begin_m.length < 2) begin_m = "0" + begin_m;  //yyyy/mm/ddの形式にするため
+    if (end_h.length < 2) end_h = "0" + end_h;  //yyyy/mm/ddの形式にするため
+    if (end_m.length < 2) end_m = "0" + end_m;  //yyyy/mm/ddの形式にするため
+    contents += `\nBEGIN:VEVENT\nDTSTART;TZID=Asia/Tokyo;VALUE=DATE-TIME:${yy}${mm}${dd}T${begin_h}${begin_m}00\nDTEND;TZID=Asia/Tokyo;VALUE=DATE-TIME:${yy}${mm}${dd}T${end_h}${end_m}00\nATTENDEE:\nDESCRIPTION:${subtitle}\nSUMMARY:${title}\nLOCATION:\nEND:VEVENT\n`
   }
   var body_text = `BEGIN:VCALENDAR\nPRODID:-//${productID}//${developer_name}//JP\nCALSCALE:GREGORIAN\nVERSION:2.0\nBEGIN:VTIMEZONE\nTZID;X-RICAL-TZSOURCE=TZINFO:Asia/Tokyo\nBEGIN:STANDARD\nDTSTART:19510908T020000\nRDATE:19510908T020000\nTZOFFSETFROM:+1000\nTZOFFSETTO:+0900\nTZNAME:JST\nEND:STANDARD\nEND:VTIMEZONE\n${contents}\nEND:VCALENDAR`
+  console.log(body_text)
   return download_ics(`${filename}.ics`, body_text);
 }
